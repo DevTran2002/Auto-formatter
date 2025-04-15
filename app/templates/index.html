@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Định dạng tài liệu khoa học</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Định dạng tài liệu khoa học</h1>
+        
+        <div class="upload-container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p class="alert">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                <div class="file-input">
+                    <label for="file">Choose a document to format:</label>
+                    <input type="file" name="file" id="file" required>
+                </div>
+
+                <div class="format-options">
+                    <h3>Document Format Settings</h3>
+                    
+                    <div class="option-group">
+                        <label for="citation_style">Kiểu trích dẫn:</label>
+                        <select name="citation_style" id="citation_style">
+                            <option value="apa">APA (7th edition)</option>
+                            <option value="mla">MLA (9th edition)</option>
+                            <option value="chicago">Chicago/Turabian</option>
+                            <option value="ieee">IEEE</option>
+                            <option value="harvard">Harvard</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="font_family">Font:</label>
+                        <select name="font_family" id="font_family">
+                            <option value="times">Times New Roman</option>
+                            <option value="arial">Arial</option>
+                            <option value="calibri">Calibri</option>
+                            <option value="cambria">Cambria</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="font_size">Font Size:</label>
+                        <select name="font_size" id="font_size">
+                            <option value="12">12 pt</option>
+                            <option value="11">11 pt</option>
+                            <option value="10">10 pt</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="line_spacing">Khoảng cách dòng:</label>
+                        <select name="line_spacing" id="line_spacing">
+                            <option value="2.0">Kép (2.0)</option>
+                            <option value="1.5">1.5 dòng</option>
+                            <option value="1.0">Đơn (1.0)</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="margin">Đệm:</label>
+                        <select name="margin" id="margin">
+                            <option value="normal">Normal (1 inch/2.54 cm all sides)</option>
+                            <option value="wide">Wide (1.5 inch/3.81 cm all sides)</option>
+                            <option value="narrow">Narrow (0.5 inch/1.27 cm all sides)</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="paragraph_spacing">Khoảng cách đoạn:</label>
+                        <select name="paragraph_spacing" id="paragraph_spacing">
+                            <option value="after">Sau đoạn</option>
+                            <option value="before">Trước đoạn</option>
+                            <option value="both">Trước và sau</option>
+                            <option value="none">Không thêm khoảng cách</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group checkboxes">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page_numbers" name="page_numbers" checked>
+                            <label for="page_numbers">Bao gồm số trang</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="title_page" name="title_page" checked>
+                            <label for="title_page">Bao gồm trang tiêu đề</label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="table_of_contents" name="table_of_contents" checked>
+                            <label for="table_of_contents">Tạo bảng nội dung</label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bibliography" name="bibliography" checked>
+                            <label for="bibliography">Bao gồm tài liệu tham khảo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="file-types">
+                    <p>Các loại tệp được hỗ trợ: .doc, .docx, .txt, .pdf</p>
+                </div>
+                <button type="submit" class="upload-btn">Định dạng tài liệu</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html> 
