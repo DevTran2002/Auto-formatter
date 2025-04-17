@@ -75,3 +75,23 @@ The application uses spaCy to intelligently format academic documents:
 ## License
 
 MIT 
+
+document-formatter/
+│
+├── app/                          # Thư mục chính của ứng dụng
+│   ├── __init__.py               # Khởi tạo ứng dụng Flask
+│   ├── templates/                # Các template HTML
+│   │   └── index.html            # Giao diện người dùng
+│   ├── static/                   # Tài nguyên tĩnh (CSS, JS)
+│   │   └── style.css             # CSS cho giao diện
+│   └── src/                      # Mã nguồn Python
+│       ├── __init__.py           # Định nghĩa package
+│       ├── config.py             # Cấu hình ứng dụng
+│       ├── document_processor.py # Xử lý tài liệu và spaCy
+│       └── routes.py             # Các route của Flask
+│
+├── uploads/                      # Thư mục lưu file tải lên
+├── app.py                        # Điểm khởi chạy ứng dụng
+├── requirements.txt              # Các thư viện cần thiết
+├── setup_spacy.py                # Script cài đặt spaCy
+└── README.md                     # Hướng dẫn sử dụng
