@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Định dạng tài liệu khoa học</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
 </head>
 <body>
     <div class="container">
@@ -21,12 +22,17 @@
                 {% endif %}
             {% endwith %}
             
-            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="document-form">
                 <div class="file-input">
                     <label for="file">Choose a document to format:</label>
                     <input type="file" name="file" id="file" required>
                 </div>
 
+                <div class="button-group">
+                    <button type="submit" class="upload-btn">Định dạng tài liệu</button>
+                    <button type="button" class="analyze-btn" id="analyze-btn">Phân tích văn bản</button>
+                </div>
+                
                 <div class="format-options">
                     <h3>Document Format Settings</h3>
                     
@@ -112,11 +118,164 @@
                 </div>
 
                 <div class="file-types">
-                    <p>Các loại tệp được hỗ trợ: .doc, .docx, .txt, .pdf</p>
+                    <p>Các loại tệp được hỗ trợ: .doc, .docx, .txt</p>
                 </div>
-                <button type="submit" class="upload-btn">Định dạng tài liệu</button>
             </form>
         </div>
     </div>
+    
+    <!-- Analysis Modal -->
+    <div id="analysisModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Phân tích văn bản</h2>
+            <div id="analysis-loading">Đang phân tích...</div>
+            <div id="analysis-results" style="display:none;">
+                <div class="analysis-section">
+                    <h3>Thống kê cơ bản</h3>
+                    <p><strong>Số câu:</strong> <span id="sentence-count"></span></p>
+                    <p><strong>Số token:</strong> <span id="token-count"></span></p>
+                </div>
+                
+                <div class="analysis-section">
+                    <h3>Thực thể được nhận diện</h3>
+                    <div id="entities-list"></div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h3>Từ khóa chính</h3>
+                    <div id="keywords-list"></div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h3>Cụm danh từ</h3>
+                    <div id="noun-chunks-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('analysisModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const analyzeBtn = document.getElementById('analyze-btn');
+        
+        analyzeBtn.onclick = function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('file');
+            
+            if (fileInput.files.length === 0) {
+                alert('Vui lòng chọn một tài liệu để phân tích');
+                return;
+            }
+            
+            modal.style.display = 'block';
+            document.getElementById('analysis-loading').style.display = 'block';
+            document.getElementById('analysis-results').style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Lỗi khi phân tích văn bản');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayAnalysisResults(data);
+            })
+            .catch(error => {
+                alert(error.message);
+                modal.style.display = 'none';
+            });
+        };
+        
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+        
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+        
+        function displayAnalysisResults(data) {
+            document.getElementById('analysis-loading').style.display = 'none';
+            document.getElementById('analysis-results').style.display = 'block';
+            
+            // Hiển thị thống kê cơ bản
+            document.getElementById('sentence-count').textContent = data.sentences;
+            document.getElementById('token-count').textContent = data.tokens;
+            
+            // Hiển thị thực thể
+            const entitiesContainer = document.getElementById('entities-list');
+            entitiesContainer.innerHTML = '';
+            
+            if (data.entities.length === 0) {
+                entitiesContainer.innerHTML = '<p>Không tìm thấy thực thể</p>';
+            } else {
+                data.entities.forEach(entity => {
+                    const entityEl = document.createElement('div');
+                    entityEl.className = 'entity-item';
+                    entityEl.style.backgroundColor = getEntityColor(entity.label);
+                    entityEl.textContent = `${entity.text} (${entity.label})`;
+                    entitiesContainer.appendChild(entityEl);
+                });
+            }
+            
+            // Hiển thị từ khóa
+            const keywordsContainer = document.getElementById('keywords-list');
+            keywordsContainer.innerHTML = '';
+            
+            if (data.keywords.length === 0) {
+                keywordsContainer.innerHTML = '<p>Không tìm thấy từ khóa</p>';
+            } else {
+                data.keywords.forEach(keyword => {
+                    const keywordEl = document.createElement('span');
+                    keywordEl.className = 'keyword-item';
+                    keywordEl.textContent = keyword;
+                    keywordsContainer.appendChild(keywordEl);
+                });
+            }
+            
+            // Hiển thị cụm danh từ
+            const nounChunksContainer = document.getElementById('noun-chunks-list');
+            nounChunksContainer.innerHTML = '';
+            
+            if (data.noun_chunks.length === 0) {
+                nounChunksContainer.innerHTML = '<p>Không tìm thấy cụm danh từ</p>';
+            } else {
+                data.noun_chunks.forEach(chunk => {
+                    const chunkEl = document.createElement('span');
+                    chunkEl.className = 'keyword-item';
+                    chunkEl.style.backgroundColor = '#f0f7e6';
+                    chunkEl.textContent = chunk;
+                    nounChunksContainer.appendChild(chunkEl);
+                });
+            }
+        }
+        
+        function getEntityColor(label) {
+            const colors = {
+                'PERSON': '#ffcccc',
+                'ORG': '#ccffcc',
+                'GPE': '#ccccff',
+                'DATE': '#ffffcc',
+                'TIME': '#ffccff',
+                'MONEY': '#ccffff',
+                'PERCENT': '#ffeecc',
+                'CARDINAL': '#eeccff'
+            };
+            
+            return colors[label] || '#eeeeee';
+        }
+    </script>
 </body>
 </html> 

@@ -3,4 +3,5 @@ requests==2.31.0
 python-dotenv==1.0.0
 flask-wtf==1.2.1
 werkzeug==2.3.7
-python-docx==0.8.11 
+python-docx==0.8.11
+spacy==3.7.2 

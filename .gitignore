@@ -1,3 +1,5 @@
 /.env.example
 /.venv
 /uploads
+*.pyc
+venv

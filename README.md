@@ -1,11 +1,12 @@
 # Document Formatter
 
-A web application that allows users to upload document files, formats them using an API, and provides the formatted versions for download.
+A web application that allows users to upload document files, formats them using spaCy NLP, and provides the formatted versions for download.
 
 ## Features
 
-- Upload document files (supports .doc, .docx, .txt, .pdf)
-- Format documents using an external API
+- Upload document files (supports .doc, .docx, .txt)
+- Format documents using spaCy for academic documents
+- Advanced text analysis with spaCy NLP
 - Download the formatted documents
 
 ## Setup
@@ -28,9 +29,14 @@ A web application that allows users to upload document files, formats them using
    pip install -r requirements.txt
    ```
 
-4. Set up your API key:
-   - Rename the `.env.example` file to `.env`
-   - Replace `your_api_key_here` with your actual API key
+4. Install spaCy language model:
+   ```
+   python setup_spacy.py
+   ```
+   Or manually:
+   ```
+   python -m spacy download en_core_web_sm
+   ```
 
 5. Run the application:
    ```
@@ -39,20 +45,32 @@ A web application that allows users to upload document files, formats them using
 
 6. Open your browser and navigate to `http://127.0.0.1:5000`
 
-## API Configuration
+## Text Analysis Features
 
-The application is configured to work with a document formatting API. You need to:
+The application includes advanced text analysis features powered by spaCy:
 
-1. Update the API endpoint URL in the `format_document` function in `app.py`
-2. Ensure your API key is correctly set in the `.env` file
-3. Adjust the API parameters in the `payload` dictionary if needed, based on your API's requirements
+- Entity recognition (people, organizations, locations, etc.)
+- Key phrase extraction
+- Sentence and token analysis
+- Noun chunk identification
+
+## Academic Formatting Features
+
+The application uses spaCy to intelligently format academic documents:
+
+1. Automatically identifies headings and paragraphs
+2. Formats citations based on selected style (APA, MLA, Chicago, IEEE)
+3. Generates table of contents based on detected headings
+4. Adds proper formatting for sections, references, and bibliography
+5. Applies academic styling rules (font, spacing, margins)
 
 ## Technologies Used
 
 - Flask: Web framework
 - Requests: API communication
 - Python-dotenv: Environment variable management
-- Werkzeug: File handling utilities
+- python-docx: Word document handling
+- spaCy: Natural Language Processing for both analysis and formatting
 
 ## License
 
